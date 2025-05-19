@@ -96,16 +96,16 @@ sys_assign <- Filter(function(e) {
 # extract the RHS of that assignment, which is the paste() call
 paste_call <- sys_assign[[3]]
 
-# pull out each argument to paste() — these are your prompt lines
+# pull out each argument to paste()
 prompt_lines <- vapply(
-  as.list(paste_call)[-1],   # drop the "paste" symbol
-  function(arg) eval(arg),   # each arg is a literal, so eval() returns the string
+  as.list(paste_call)[-1], # drop the "paste" symbol
+  function(arg) eval(arg), # each arg is a literal, so eval() returns the string
   character(1)
 )
 
-# print in blockquote style
+# use a combination of blockquote and HTML for italic
 for(line in prompt_lines) {
-  cat("> *", line, "*\n>\n", sep = "")
+  cat("> <em>", line, "</em>\n>\n", sep = "")
 }
 ```
 
