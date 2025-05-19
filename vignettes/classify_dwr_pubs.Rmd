@@ -83,29 +83,29 @@ classification.
 Here is the system prompt used for classification:
 
 ```{r print-system-prompt, echo = FALSE, results = "asis"}
-classify_pubs_gemini_code <- deparse(classify_pubs_gemini)
-full_text <- paste(classify_pubs_gemini_code, collapse = "\n")
-system_prompt_pattern <- "system_prompt\\s*<-\\s*paste\\(([^)]+)\\)"
-system_prompt_match <- regexpr(system_prompt_pattern, full_text, perl = TRUE)
+# get the function body
+fb <- as.list(body(classify_pubs_gemini))
 
-if (system_prompt_match > 0) {
-  captured_text <- regmatches(full_text, system_prompt_match)
-  
-  system_prompt_content <- gsub(
-    "system_prompt\\s*<-\\s*paste\\((.*)\\)", "\\1",
-    captured_text
-  )
-  
-  system_prompt_lines <- strsplit(system_prompt_content, ",\\s*\"|\",\\s*")[[1]]
-  system_prompt_lines <- gsub("^\\s*\"|\"\\s*$", "", system_prompt_lines)
-  system_prompt_lines <- gsub("^\\s+|\\s+$", "", system_prompt_lines)
-  system_prompt_lines <- system_prompt_lines[system_prompt_lines != ""]
-  
-  for (line in system_prompt_lines) {
-    cat("> *", line, "*\n>\n", sep="")
-  }
-} else {
-  cat("> *Could not extract system prompt from function.*")
+# find the assignment to system_prompt
+sys_assign <- Filter(function(e) {
+  is.call(e) &&
+    identical(e[[1]], as.symbol("<-")) &&
+    identical(e[[2]], as.symbol("system_prompt"))
+}, fb)[[1]]
+
+# extract the RHS of that assignment, which is the paste() call
+paste_call <- sys_assign[[3]]
+
+# pull out each argument to paste() — these are your prompt lines
+prompt_lines <- vapply(
+  as.list(paste_call)[-1],   # drop the "paste" symbol
+  function(arg) eval(arg),   # each arg is a literal, so eval() returns the string
+  character(1)
+)
+
+# print in blockquote style
+for(line in prompt_lines) {
+  cat("> *", line, "*\n>\n", sep = "")
 }
 ```
 
