@@ -1,0 +1,9 @@
+pandoc: '3.4'
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  classify_dwr_pubs: classify_dwr_pubs.html
+last_built: 2025-05-19T19:37Z
+urls:
+  reference: https://lucy-dwr.github.io/pubclassify/reference
+  article: https://lucy-dwr.github.io/pubclassify/articles
