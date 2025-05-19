@@ -1,6 +1,6 @@
 Package: pubclassify
 Title: Classify Scientific Publications with LLMs
-Version: 0.1.0.9000
+Version: 0.1.0.9001
 Authors@R: 
     person("Lucy", "Andrews", , "lucy.andrews@water.ca.gov", role = c("aut", "cre"))
 Description:
