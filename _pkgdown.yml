@@ -1,0 +1,181 @@
+url: ~
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    # primary
+    primary: "#0B2545"
+    # accent
+    info: "#5BC0EB"
+    warning: "#F9A826"
+    danger: "#E76F51"
+    success: "#3CAEA3"
+    # navbar styling
+    navbar-bg: "#FFFFFF"
+    navbar-light-brand-color: "#0B2545"
+    navbar-light-brand-hover-color: "#5BC0EB"
+    navbar-light-hover-color: "#F9A826"
+    # card styling
+    card-cap-bg: "#F8F9FA"
+    card-border-color: "#E9ECEF"
+    # links
+    link-color: "#0B2545"
+    link-hover-color: "#5BC0EB"
+    # button styling
+    btn-primary-bg: "#0B2545"
+    btn-primary-border: "#0B2545"
+    btn-info-bg: "#5BC0EB"
+    btn-info-border: "#5BC0EB"
+    btn-warning-bg: "#F9A826"
+    btn-warning-border: "#F9A826"
+  params:
+    logo:
+      src: man/figures/pubclassify-hex.png
+      width: 120
+      height: 139
+      alt: pubclassify logo
+  includes:
+    in_header: |
+      <style>
+        /* base font size - slightly larger than 10pt */
+        :root {
+          font-size: 1rem;
+        }
+
+        /* Larger heading sizes for better proportion */
+        h1 { font-size: 2.1rem; }
+        h2 { font-size: 1.7rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+
+        /* Make main page title bigger and bold */
+        .template-home .page-header h1 {
+          font-size: 3.2rem;
+          font-weight: 700;
+        }
+
+        /* Make function page titles bigger and bold */
+        .template-reference-topic .page-header h1 {
+          font-size: 2.5rem;
+          font-weight: 700;
+        }
+
+        /* Make vignette titles bigger and bold */
+        .template-article .page-header h1 {
+          font-size: 2.8rem;
+          font-weight: 700;
+        }
+
+        /* body text */
+        p, li, td, th { font-size: 1rem; }
+
+        /* Make code blocks smaller */
+        pre, pre code, .sourceCode { font-size: 0.85rem; }
+        code { font-size: 0.9rem; }
+
+        /* other elements */
+        .navbar { font-size: 1rem; }
+        .nav-pills .nav-link { font-size: 1rem; }
+        .ref-index .ref-description { font-size: 1rem; }
+        footer { font-size: 1rem; }
+
+        /* column width adjustments */
+        @media (min-width: 992px) {
+          /* make main content width a bit smaller to allow sidebar to be wider */
+          .col-md-9 {
+            flex: 0 0 auto;
+            width: 85%;
+          }
+
+          /* make sidebar wider */
+          .col-md-3 {
+            flex: 0 0 auto;
+            width: 15%;
+          }
+
+          /* for reference pages with larger layout */
+          .row > .col-xl-8 {
+            flex: 0 0 auto;
+            width: 85%;
+          }
+
+          .row > .col-xl-4 {
+            flex: 0 0 auto;
+            width: 15%;
+          }
+        }
+
+        /* Improve sidebar text display */
+        .sidebar .list-unstyled li {
+          white-space: nowrap;  /* Prevent text wrapping in sidebar links */
+          overflow: visible;    /* Allow text to be fully visible */
+        }
+
+        /* Make sure citation links don't wrap */
+        .sidebar h2 {
+          white-space: nowrap;
+          overflow: visible;
+        }
+
+        /* Fix dropdown menu styling */
+        .dropdown-menu {
+          background-color: #e2e6ea !important; /* Medium-light gray background - darker than before */
+          border: 1px solid rgba(0,0,0,0.15);   /* Add a subtle border */
+        }
+
+        .dropdown-item, .dropdown-menu a {
+          color: #212529 !important; /* Dark text color (almost black) */
+        }
+
+        .dropdown-item:hover, .dropdown-menu a:hover {
+          background-color: #cbd3da !important; /* Darker gray on hover */
+          color: #000 !important; /* Black text on hover */
+        }
+
+        /* Ensure active items are also readable */
+        .dropdown-item.active, .dropdown-item:active {
+          background-color: #0B2545 !important; /* Your primary color */
+          color: white !important;
+        }
+      </style>
+
+home:
+  title: "pubclassify: Retrieve and Classify Publications with Large Language Models"
+  sidebar:
+    structure: [license, citation, authors]
+
+navbar:
+  structure:
+    left: [home, reference, articles]
+    right: [search, github]
+
+reference:
+- title: "Retrieval functions"
+  desc: >
+    Functions for retrieving publication and funder metadata from CrossRef.
+  contents:
+  - get_funded
+  - get_funder_info
+  - get_pubs
+
+- title: "Data cleaning functions"
+  desc: >
+    Functions for cleaning and standardizing publication metadata.
+  contents:
+  - clean_crossref_result
+  - clean_doi
+  - clean_jats_abstracts
+  - clean_text
+  - extract_author_info
+  - extract_year_vectorized
+  - search_cols
+
+- title: "Formatting and classification functions"
+  desc: >
+    Functions for formatting citations and classifying publications.
+  contents:
+  - classify_pubs_gemini
+  - create_bibtex
+  - format_bibtex_authors
+  - format_citation
+  - matches("^format_[a-z]+$")

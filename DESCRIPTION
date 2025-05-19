@@ -1,0 +1,42 @@
+Package: pubclassify
+Title: Classify Scientific Publications with LLMs
+Version: 0.1.0.9000
+Authors@R: 
+    person("Lucy", "Andrews", , "lucy.andrews@water.ca.gov", role = c("aut", "cre"))
+Description:
+    Compose databases of scientific publications and classify them according to
+    the National Science Foundation (NSF) classification scheme.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.5)
+LazyData: true
+Imports:
+    dplyr (>= 1.1.4),
+    ellmer (>= 0.2.0),
+    glue (>= 1.8.0),
+    janitor (>= 2.2.1),
+    jsonlite (>= 2.0.0),
+    progress (>= 1.2.3),
+    purrr (>= 1.0.4),
+    rcrossref (>= 1.2.0),
+    stringr (>= 1.5.1),
+    tibble (>= 3.2.1),
+    xml2 (>= 1.3.6)
+Suggests: 
+    forcats,
+    ggplot2,
+    here (>= 1.0.1),
+    kableExtra,
+    knitr,
+    RColorBrewer,
+    readr (>= 2.1.5),
+    rmarkdown,
+    testthat (>= 3.0.0),
+    tidyr,
+    treemapify,
+    usethis (>= 3.1.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3

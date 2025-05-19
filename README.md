@@ -1,0 +1,184 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# pubclassify <img src="man/figures/pubclassify-hex.png" align="right" alt="" width="120" />
+
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/lucy-dwr/pubclassify/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lucy-dwr/pubclassify/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/pubclassify)](https://CRAN.R-project.org/package=pubclassify)
+[![Codecov test
+coverage](https://codecov.io/gh/lucy-dwr/pubclassify/branch/main/graph/badge.svg)](https://app.codecov.io/gh/lucy-dwr/pubclassify?branch=main)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Dev
+Version](https://img.shields.io/badge/devel%20version-0.1.0.9000-blue.svg)](https://github.com/lucy-dwr/pubclassify)
+<!-- badges: end -->
+
+## Overview
+
+`pubclassify` is an R package for retrieving, processing, and
+classifying academic publications using large language models (LLMs).
+The package provides tools and inspiration for:
+
+- **Retrieving** publication metadata from CrossRef using various query
+  methods
+- **Cleaning** and standardizing DOIs, abstracts, and other publication
+  metadata
+- **Formatting** citations in multiple academic styles (APA, Chicago,
+  Nature, Science, AGU)
+- **Classifying** publications using Google’s Gemini LLM
+- **Analyzing** classification results with visualization-friendly data
+  structures
+
+## Installation
+
+You can install the development version of pubclassify from GitHub with:
+
+``` r
+# install devtools first if needed:
+# install.packages("devtools")
+devtools::install_github("lucy-dwr/pubclassify")
+```
+
+## Main Workflow
+
+A typical workflow with `pubclassify` involves four main steps:
+
+### 1. Retrieve publications
+
+``` r
+library(pubclassify)
+
+# option A: by funder ID
+funder_info <- get_funder_info("US National Institutes of Health")
+nih_pubs <- get_funded(funder_info$id[1], total = 100)
+
+# option B: by DOIs
+my_dois <- c(
+  "10.1038/s41586-019-1401-2",
+  "10.1126/science.aaf7671",
+  "10.1088/1748-9326/9/8/084012"
+)
+my_pubs <- get_pubs(dois = my_dois)
+
+# option C: by keyword search
+oroville_pubs <- get_pubs(
+  query = "Oroville Dam",
+  filter = c(from_pub_date = "2020-01-01"),
+  total = 30
+)
+```
+
+### 2. Clean and process the data
+
+``` r
+nih_pubs_cleaned <- clean_crossref_result(nih_pubs) |>
+  dplyr::mutate(
+    # extract clean DOIs
+    doi = clean_doi(doi),
+    
+    # extract author information
+    author_info = lapply(author, extract_author_info),
+    lead_author_first_name = sapply(author_info, \(x) x$lead_author_first_name),
+    lead_author_last_name = sapply(author_info, \(x) x$lead_author_last_name),
+    author_count = sapply(author_info, \(x) x$author_count),
+    
+    # extract publication year
+    pub_year = extract_year_vectorized(published_print, published_online, created)
+  ) |>
+  dplyr::select(-author_info) |>
+  dplyr::filter(!is.na(abstract_text))
+```
+
+### 3. Classify publications with an LLM
+
+``` r
+classified_nih_pubs <- classify_pubs_gemini(nih_pubs_cleaned)
+```
+
+### 4. Analyze results
+
+``` r
+# combine with original data
+nih_results <- dplyr::left_join(nih_pubs_cleaned, classified_nih_pubs, by = "doi")
+
+# summarize classifications
+nih_summary <- nih_results |>
+  dplyr::filter(!is.na(first_level)) |>
+  dplyr::count(first_level, second_level, sort = TRUE)
+
+# format top publications as citations
+top_nih_pubs <- nih_results |> 
+  dplyr::filter(!is.na(first_level)) |>
+  dplyr::slice_head(n = 3)
+
+nih_citations <- sapply(1:nrow(top_nih_pubs), function(i) {
+  format_citation(top_nih_pubs[i, ], style = "chicago", link_doi = TRUE)
+})
+
+# display results
+print(head(nih_summary, 8))
+cat("\nTop publications:\n\n")
+cat(paste(seq_along(nih_citations), nih_citations, sep = ". ", collapse = "\n\n"))
+```
+
+## Function reference
+
+### Retrieval functions
+
+``` r
+# search for a funder by name
+funder_info <- get_funder_info("California Department of Water Resources")
+
+# get publications by funder ID
+funded_pubs <- get_funded("100000001", filter = c(type = "journal-article"))
+
+# get publications by DOIs, keyword, or filters
+pubs_by_doi <- get_pubs(dois = c("10.1038/nature12345"))
+pubs_by_query <- get_pubs(query = "machine learning")
+pubs_by_filter <- get_pubs(filter = c(from_pub_date = "2023-01-01"))
+```
+
+### Data cleaning functions
+
+``` r
+# clean DOIs from various formats
+clean_dois <- clean_doi(c("https://doi.org/10.1234/example", "doi:10.5678/test"))
+
+# clean CrossRef API results
+cleaned_pubs <- clean_crossref_result(raw_pubs, pattern = "climate")
+
+# extract publication years
+years <- extract_year_vectorized(published_print, published_online, created)
+
+# extract author information
+author_data <- extract_author_info(publication$author[[1]])
+
+# search across columns for a pattern
+search_results <- search_cols(publications, "model", ignore_case = TRUE)
+```
+
+### Formatting and classification functions
+
+``` r
+# format citation in different styles
+apa_citation <- format_citation(publication, style = "apa")
+chicago_citation <- format_citation(publication, style = "chicago")
+nature_citation <- format_citation(publication, style = "nature")
+science_citation <- format_citation(publication, style = "science")
+agu_citation <- format_citation(publication, style = "agu")
+
+# classify publications with LLM
+classified <- classify_pubs_gemini(publications, model = "gemini-2.0-flash")
+```
+
+## Getting help
+
+If you encounter issues, please file a report with a reproducible
+example on [GitHub](https://github.com/lucy-dwr/pubclassify/issues).
+
+## License
+
+This package is licensed under the MIT License.
