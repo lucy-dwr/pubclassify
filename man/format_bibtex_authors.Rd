@@ -28,7 +28,7 @@ partial author information according to BibTeX conventions.
 The function processes different types of author entities:
 \itemize{
 \item Individual authors: formatted as "Family, Given"
-\item Organizations: enclosed in braces like "{Organization Name}"
+\item Organizations: enclosed in braces like "\{Organization Name\}"
 \item Partial information: sses available name parts, with "Unknown" for
 missing family names
 }
