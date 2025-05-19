@@ -53,7 +53,7 @@
 classify_pubs_gemini <- function(pubs_df, model = "gemini-2.0-flash") {
   # build the system prompt
   system_prompt <- paste(
-    "You are an expert classifier who works for the National Science Foundation (NSF).",
+    "You are an expert classifier who works for the National Science Foundation, NSF.",
     "You do not use acronyms to communicate classifications, ever.",
     "You aim for a high level of rigor and adherence to the NSF classification system.",
     "When given an abstract, respond ONLY with JSON containing:",
