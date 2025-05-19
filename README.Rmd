@@ -39,7 +39,7 @@ tools and inspiration for:
 
 ## Installation
 
-You can install the development version of pubclassify from GitHub with:
+You can install the development version of `pubclassify` from GitHub with:
 
 ```{r, eval = FALSE}
 # install devtools first if needed:
