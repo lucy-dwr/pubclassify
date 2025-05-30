@@ -15,7 +15,8 @@ out.width = "100%",
 comment = "#>"
 )
 
-library(pubclassify)
+# library(pubclassify)
+devtools::load_all()
 ```
 
 # Introduction
@@ -109,10 +110,39 @@ for(line in prompt_lines) {
 }
 ```
 
+The National Science Foundation (NSF) classification system referenced in the
+system prompt is used for the annual NSF Survey of Earned Doctorates (SED). The 
+most recent version of the SED taxonomy is [described here](https://ncses.nsf.gov/pubs/ncses23200).
+
+Here is an example of elements in the taxonomy.
+
+```{r show-taxonomy, echo = FALSE}
+nsf_sed_taxonomy |>
+  dplyr::select(first_level, second_level, third_level) |>
+  head(10) |>
+  knitr::kable(
+    col.names = c(
+      "First-level classification", 
+      "Second-level classification",
+      "Third-level classification"
+    )
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = TRUE
+  ) |>
+  kableExtra::row_spec(
+    row = 0, 
+    bold = TRUE, 
+    background = "#E0E0E0",
+    extra_css = "vertical-align: middle;"
+  )
+```
+
+
 Each abstract was fed to the [Google Gemini 2.0 Flash large language model (LLM)](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash),
 a cost-efficient, non-thinking model with a knowledge cutoff of June 2024. The 
-LLM produced a three-level National Science Foundation (NSF) classification for 
-each article.
+LLM produced a three-level NSF classification for each article.
 
 ```{r classify-pubs, include = FALSE}
 # this is what would be run to classify publications, but it's time-intensive
@@ -130,8 +160,6 @@ if (FALSE) {
 ```
 
 ```{r display-classified-pubs-table, echo = FALSE}
-n_display <- 10
-
 classified_table <- dwr_pubs_classified |>
   dplyr::filter(!is.na(first_level)) |>
   dplyr::mutate(
@@ -146,7 +174,7 @@ classified_table <- dwr_pubs_classified |>
     )
   ) |>
   dplyr::select(article, first_level, second_level, third_level) |>
-  head(n_display)
+  head(10)
 
 classified_table |>
   knitr::kable(

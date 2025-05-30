@@ -2,13 +2,16 @@
 % Please edit documentation in R/classify_pubs.R
 \name{classify_pubs_gemini}
 \alias{classify_pubs_gemini}
-\title{Classify publications using Google's Gemini LLM}
+\title{Classify publications using Google's Gemini LLM with an external NSF taxonomy}
 \usage{
-classify_pubs_gemini(pubs_df, model = "gemini-2.0-flash")
+classify_pubs_gemini(pubs_df, taxonomy_df, model = "gemini-2.0-flash")
 }
 \arguments{
 \item{pubs_df}{A dataframe containing publication information. Must include
-columns for 'doi' and 'abstract_text'.}
+columns 'doi' and 'abstract_text'.}
+
+\item{taxonomy_df}{A dataframe containing the NSF taxonomy. Must include
+columns 'first_level', 'second_level', and 'third_level'.}
 
 \item{model}{Character string specifying which Gemini model to use.
 Default is "gemini-2.0-flash".}
@@ -19,34 +22,20 @@ A tibble with the following columns:
 \item{first_level}{NSF first-level classification field}
 \item{second_level}{NSF second-level classification field}
 \item{third_level}{NSF third-level classification field}
-\item{raw_response}{List column containing the complete raw JSON response from the Gemini API}
+\item{raw_response}{List column containing the complete raw JSON response}
 }
 \description{
 Uses Google's Gemini LLM to classify academic publications according to the
-National Science Foundation (NSF) fields of study classification system.
-The function takes a dataframe of publications with abstracts and returns
-classifications at three hierarchical levels of the NSF taxonomy.
-}
-\details{
-This function processes each publication abstract through the Gemini LLM model
-with a specialized prompt that instructs the model to classify according to
-NSF fields. It extracts JSON from the model's response and parses it into a
-structured format. The function displays a progress bar during processing to
-track completion status.
-}
-\note{
-Requires the 'ellmer' package for interfacing with Google's Gemini LLM,
-and an appropriate API key must be configured for the ellmer package.
+National Science Foundation (NSF) fields-of-study classification system.
+The function accepts a dataframe of publication abstracts and a taxonomy
+dataframe, uploads the taxonomy to the LLM, and returns hierarchical
+classifications.
 }
 \examples{
 \dontrun{
-# assume 'my_publications' is a dataframe with 'doi' and 'abstract_text' columns
-classifications <- classify_pubs_gemini(my_publications)
-
-# use a different Gemini model
 classifications <- classify_pubs_gemini(
   my_publications,
-  model = "gemini-1.5-pro"
+  taxonomy_df = nsf_sed_taxonomy
 )
 }
 

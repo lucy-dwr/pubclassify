@@ -1,4 +1,8 @@
-dwr_pubs_classified <- classify_pubs_gemini(dwr_pubs, model = "gemini-2.0-flash")
+dwr_pubs_classified <- classify_pubs_gemini(
+  dwr_pubs,
+  taxonomy_df = nsf_sed_taxonomy,
+  model = "gemini-2.0-flash"
+)
 
 dwr_pubs_classified <- dwr_pubs_classified |>
   dplyr::mutate(
