@@ -8,3 +8,4 @@ docs
 .quarto
 
 data-raw/employee_division_year.xlsx
+data/employees_divisions.rda
