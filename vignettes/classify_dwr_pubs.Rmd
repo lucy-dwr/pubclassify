@@ -104,7 +104,7 @@ contribution_colors <- contribution_colors[c(1, 2, 5)]
 
 # create a stacked bar plot
 ggplot2::ggplot(contribution_data, ggplot2::aes(x = "", y = n, fill = category)) +
-  ggplot2::geom_col(width = 0.5, color = "white", size = 0.5) +
+  ggplot2::geom_col(width = 0.5, color = "white", linewidth = 0.5) +
   # labels for large proportions (inside)
   ggplot2::geom_text(
     data = contribution_data |> dplyr::filter(label_pos == "inside"),
