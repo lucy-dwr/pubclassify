@@ -21,9 +21,12 @@ clean_names_case <- function(x) {
   )
 }
 
-# clean the names
+# clean the names and types
 dwr_employees_divisions <- dwr_employees_divisions |>
-  dplyr::mutate(employee = clean_names_case(employee))
+  dplyr::mutate(
+    employee = clean_names_case(employee),
+    year = as.integer(year)
+  )
 
 # write out
 usethis::use_data(dwr_employees_divisions, overwrite = TRUE)
