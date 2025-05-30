@@ -132,7 +132,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
+<li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/classify_dwr_pubs.html">DWR Publication Classification using an LLM</a></li>
@@ -241,6 +241,26 @@ dynamical model ensembles, which can be attributed to a robust
 statistical response of precipitation in this region to SST anomalies
 from the previous year in the tropical Pacific.</em></p>
 </blockquote>
+<div class="section level3">
+<h3 id="dwr-role">DWR role<a class="anchor" aria-label="anchor" href="#dwr-role"></a>
+</h3>
+<p>DWR serves two roles in the publications listed in this inventory:
+authorship and funding. Sometimes, DWR contributes both to a single
+publication. Most of DWR’s contributions come in the form of
+funding.</p>
+<p><img src="classify_dwr_pubs_files/figure-html/visualize-role-1.png" width="100%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="division-author-contributions">Division author contributions<a class="anchor" aria-label="anchor" href="#division-author-contributions"></a>
+</h3>
+<p>In the case of DWR authorship, publications were assigned a DWR
+division based on the divisional affiliation of the highest-ranking
+author. To add the division information, author names were fuzzy-matched
+with a roster of all employees, divisions, and years since 2020. DWR
+authors are spread across 13 divisions. The division that has published
+the greatest number of manuscripts is DISE</p>
+<p><img src="classify_dwr_pubs_files/figure-html/visualize-divisions-1.png" width="100%" style="display: block; margin: auto;"></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="large-language-model-classification">Large language model classification<a class="anchor" aria-label="anchor" href="#large-language-model-classification"></a>
@@ -252,23 +272,152 @@ instructs the model on how to perform the classification.</p>
 <p>Here is the system prompt used for classification:</p>
 <blockquote>
 <p><em>You are an expert classifier who works for the National Science
-Foundation, NSF.</em></p>
-<p><em>You do not use acronyms to communicate classifications,
-ever.</em></p>
-<p><em>You aim for a high level of rigor and adherence to the NSF
-classification system.</em></p>
-<p><em>When given an abstract, respond ONLY with JSON
-containing:</em></p>
-<p><em>- doi: the article DOI</em></p>
-<p><em>- first_level: NSF first-level classification field</em></p>
-<p><em>- second_level: NSF second-level classification field</em></p>
-<p><em>- third_level: NSF third-level classification field</em></p>
+Foundation (NSF).</em></p>
+<p><em>I am uploading a file containing the complete NSF fields-of-study
+taxonomy.</em></p>
+<p><em>Please load that CSV into memory and use it to classify any
+abstracts I send.</em></p>
+<p><em>When I send an abstract, reply ONLY with JSON containing: doi,
+first_level,</em></p>
+<p><em>second_level, and third_level (matching exactly the taxonomy
+values).</em></p>
+<p><em>Do not wrap output in markdown or code fences or add any extra
+text.</em></p>
 </blockquote>
+<p>The National Science Foundation (NSF) classification system
+referenced in the system prompt is used for the annual NSF Survey of
+Earned Doctorates (SED). The most recent version of the SED taxonomy is
+<a href="https://ncses.nsf.gov/pubs/ncses23200" class="external-link">described here</a>.</p>
+<p>Here is an example of elements in the taxonomy.</p>
+<table class="table table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;font-weight: bold;background-color: rgba(224, 224, 224, 255) !important;vertical-align: middle;">
+First-level classification
+</th>
+<th style="text-align:left;font-weight: bold;background-color: rgba(224, 224, 224, 255) !important;vertical-align: middle;">
+Second-level classification
+</th>
+<th style="text-align:left;font-weight: bold;background-color: rgba(224, 224, 224, 255) !important;vertical-align: middle;">
+Third-level classification
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+agronomy and crop science
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+animal sciences
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+food science and technology
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+plant sciences
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+soil sciences
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+veterinary biomedical and clinical sciences
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences
+</td>
+<td style="text-align:left;">
+agricultural, animal, plant, and veterinary sciences nec
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+natural resources and conservation
+</td>
+<td style="text-align:left;">
+environmental science
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+natural resources and conservation
+</td>
+<td style="text-align:left;">
+environmental/natural resources management and policy
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+agricultural sciences and natural resources
+</td>
+<td style="text-align:left;">
+natural resources and conservation
+</td>
+<td style="text-align:left;">
+forestry
+</td>
+</tr>
+</tbody>
+</table>
 <p>Each abstract was fed to the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash" class="external-link">Google
 Gemini 2.0 Flash large language model (LLM)</a>, a cost-efficient,
 non-thinking model with a knowledge cutoff of June 2024. The LLM
-produced a three-level National Science Foundation (NSF) classification
-for each article.</p>
+produced a three-level NSF classification for each article.</p>
 <table class="table table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
 <th style="text-align:left;font-weight: bold;background-color: rgba(224, 224, 224, 255) !important;vertical-align: middle;">
@@ -291,13 +440,13 @@ Switanek, Matthew B. et al. (2020). Present and Past Sea Surface
 Temperatures: A Recipe for Better Seasonal Climate Forecasts
 </td>
 <td style="text-align:left;width: 20%; ">
-atmospheric science
+geosciences, atmospheric, and ocean sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-climate and large-scale dynamics
+ocean, marine, and atmospheric science
 </td>
 <td style="text-align:left;width: 20%; ">
-climate prediction
+atmospheric sciences and meteorology, general
 </td>
 </tr>
 <tr>
@@ -307,13 +456,13 @@ Salinity Variation in the San Francisco Estuary: Can We Anticipate and
 Manage the Coming Changes?
 </td>
 <td style="text-align:left;width: 20%; ">
-ocean sciences
+geosciences, atmospheric, and ocean sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-estuarine dynamics
+ocean, marine, and atmospheric science
 </td>
 <td style="text-align:left;width: 20%; ">
-ecological impacts
+marine sciences
 </td>
 </tr>
 <tr>
@@ -323,13 +472,13 @@ Microcystins in Sediments and Clam Tissue in the Sacramento–San Joaquin
 River Delta, California, USA
 </td>
 <td style="text-align:left;width: 20%; ">
-environmental science
+biological and biomedical sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-environmental toxicology
+pharmacology and toxicology
 </td>
 <td style="text-align:left;width: 20%; ">
-ecotoxicology
+toxicology
 </td>
 </tr>
 <tr>
@@ -338,13 +487,13 @@ Croston, Rebecca et al. (2020). Timing, frequency, and duration of
 incubation recesses in dabbling ducks
 </td>
 <td style="text-align:left;width: 20%; ">
+biological and biomedical sciences
+</td>
+<td style="text-align:left;width: 20%; ">
+ecology, evolutionary biology, and epidemiology
+</td>
+<td style="text-align:left;width: 20%; ">
 ecology
-</td>
-<td style="text-align:left;width: 20%; ">
-animal ecology
-</td>
-<td style="text-align:left;width: 20%; ">
-behavioral ecology
 </td>
 </tr>
 <tr>
@@ -353,13 +502,13 @@ Cao, Qian et al. (2020). Floods due to Atmospheric Rivers along the U.S.
 West Coast: The Role of Antecedent Soil Moisture in a Warming Climate
 </td>
 <td style="text-align:left;width: 20%; ">
-hydrology
+geosciences, atmospheric, and ocean sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-surface water hydrology
+geological and earth sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-floods
+hydrology and water resources science
 </td>
 </tr>
 <tr>
@@ -369,13 +518,13 @@ of &lt;i&gt;Microcystis&lt;/i&gt; on Threadfin Shad, &lt;i&gt;Dorosoma
 petenense&lt;/i&gt;, in San Francisco Estuary
 </td>
 <td style="text-align:left;width: 20%; ">
-environmental science
+biological and biomedical sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-environmental toxicology
+pharmacology and toxicology
 </td>
 <td style="text-align:left;width: 20%; ">
-aquatic toxicology
+toxicology
 </td>
 </tr>
 <tr>
@@ -385,13 +534,13 @@ the Western and Southwestern United States: Characteristics, Trends, and
 Predictability Sources
 </td>
 <td style="text-align:left;width: 20%; ">
-atmospheric science
+geosciences, atmospheric, and ocean sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-climate and large-scale dynamics
+ocean, marine, and atmospheric science
 </td>
 <td style="text-align:left;width: 20%; ">
-drought
+atmospheric sciences and meteorology, general
 </td>
 </tr>
 <tr>
@@ -401,13 +550,13 @@ Evapotranspiration and Crop Coefficients of California Date Palms Using
 the Residual of Energy Balance Approach
 </td>
 <td style="text-align:left;width: 20%; ">
-agronomy
+agricultural sciences and natural resources
 </td>
 <td style="text-align:left;width: 20%; ">
-irrigation science
+agricultural, animal, plant, and veterinary sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-water management
+agronomy and crop science
 </td>
 </tr>
 <tr>
@@ -417,13 +566,13 @@ identification for ecological studies and monitoring using CRISPR‐based
 SHERLOCK
 </td>
 <td style="text-align:left;width: 20%; ">
-ecology
+biological and biomedical sciences
 </td>
 <td style="text-align:left;width: 20%; ">
-molecular ecology
+genetics and genomics
 </td>
 <td style="text-align:left;width: 20%; ">
-species identification
+genome sciences and genomics
 </td>
 </tr>
 <tr>
@@ -433,13 +582,13 @@ Generator for the Sacramento–San Joaquin Delta of California via Deep
 Learning
 </td>
 <td style="text-align:left;width: 20%; ">
-hydrology
+engineering
 </td>
 <td style="text-align:left;width: 20%; ">
-surface water hydrology
+civil, environmental, and transportation engineering
 </td>
 <td style="text-align:left;width: 20%; ">
-estuarine hydrology
+environmental/environmental health engineering
 </td>
 </tr>
 </tbody>
@@ -448,23 +597,23 @@ estuarine hydrology
 <h3 id="classification-visualizations">Classification visualizations<a class="anchor" aria-label="anchor" href="#classification-visualizations"></a>
 </h3>
 <p>Since 2020, DWR has published the most papers in the first-level
-classification of ecology (153 papers), followed by atmospheric science
-(94 papers). Only a handful of papers have been published in genetics;
-microbiology; political science; social, behavioral, and economic
-sciences; geodesy; and limnology.</p>
+classification of geosciences, atmospheric, and ocean sciences (171
+papers), followed by biological and biomedical sciences (129 papers).
+Only a handful of papers have been published in other non-science and
+engineering; education; and mathematics and statistics.</p>
 <p><img src="classify_dwr_pubs_files/figure-html/visualize-first-level-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>Drilling down one level further in the classification, we can see
-that many papers have been published that address aquatic ecology (65
-papers), surface water hydrology (42 papers), and climate and
-large-scale dynamics (31 papers).</p>
+that many papers have been published that address ecology, evolutionary
+biology, and epidemiology (96 papers), ocean, marine, and atmospheric
+science (96 papers), and geological and earth sciences (75 papers).</p>
 <p><img src="classify_dwr_pubs_files/figure-html/visualize-hierarchy-1.png" width="100%" style="display: block; margin: auto;"></p>
-<p>Total DWR publications rose from 99 in 2020 to a peak of 138 in 2022.
-The two leading fields—ecology and atmospheric science—have variable
-counts of publications per year, reflecting ebbs and flows in scientific
-work, likely due to the impacts of COVID-19 in this analysis window.
-Smaller topics such as agronomy, genetics, and political science, with
-no more than 1 papers in any year, remain relatively flat over the
-period.</p>
+<p>Total DWR publications rose from 99 in 2020 to a peak of 136 in 2022.
+The two leading fields—geosciences, atmospheric, and ocean sciences and
+biological and biomedical sciences—have variable counts of publications
+per year, reflecting ebbs and flows in scientific work, likely due to
+the impacts of COVID-19 in this analysis window. Smaller topics such as
+social sciences, and mathematics and statistics, with no more than 4
+papers in any year, remain relatively flat over the period.</p>
 <p><img src="classify_dwr_pubs_files/figure-html/visualize-time-trend-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
