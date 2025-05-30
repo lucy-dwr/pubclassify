@@ -28,11 +28,18 @@ dwr_pubs <- dwr_pubs |>
     created
   ))
 
-# add contribution types
+# add contribution types; where it's not clear, mark DWR as a funder
 dwr_pubs <- dwr_pubs |>
   dplyr::mutate(
     dwr_author = purrr::map_lgl(matching_cols, ~ "author" %in% .x),
     dwr_funder = purrr::map_lgl(matching_cols, ~ "funder" %in% .x)
+  ) |>
+  dplyr::mutate(
+    dwr_funder = dplyr::if_else(
+      dwr_author == FALSE & dwr_funder == FALSE,
+      TRUE,
+      dwr_funder
+    )
   )
 
 # define a function to create a full author name
@@ -114,13 +121,12 @@ dwr_pubs <- dwr_pubs |>
   dplyr::rowwise() |>
   dplyr::mutate(
     division = match_publication_division(
-      pub_row = dplyr::cur_data(),
+      pub_row = dplyr::tibble(pub_year = pub_year, author = list(author)),
       employees_df = dwr_employees_divisions,
       similarity_threshold = 0.95
     )
   ) |>
   dplyr::ungroup()
-
 
 # write out
 usethis::use_data(dwr_pubs, overwrite = TRUE)
