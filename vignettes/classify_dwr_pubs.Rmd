@@ -73,6 +73,123 @@ publication:
 cat("> *", abstract_text, "*", sep = "")
 ```
 
+## DWR role
+
+DWR serves two roles in the publications listed in this inventory: authorship
+and funding. Sometimes, DWR contributes both to a single publication. Most of
+DWR's contributions come in the form of funding.
+
+```{r visualize-role, echo = FALSE, fig.width = 10, fig.height = 6}
+# create the categories
+contribution_data <- dwr_pubs |>
+  dplyr::mutate(
+    category = dplyr::case_when(
+      dwr_author == TRUE & dwr_funder == TRUE ~ "funding and authorship",
+      dwr_author == TRUE & dwr_funder == FALSE ~ "only authorship", 
+      dwr_author == FALSE & dwr_funder == TRUE ~ "only funding",
+      .default = "neither"  # this shouldn't exist based on logic used in cleaning
+    )
+  ) |>
+  dplyr::count(category) |>
+  dplyr::mutate(
+    label_pos = ifelse(n/sum(n) > 0.05, "inside", "outside"),
+    label_text = paste0(n, " (", round(n/sum(n)*100, 1), "%)")
+  )
+
+# create colors
+contribution_colors <- grDevices::colorRampPalette(
+  RColorBrewer::brewer.pal(12, "Paired")
+)(6)
+
+contribution_colors <- contribution_colors[c(1, 2, 5)]
+
+# create a stacked bar plot
+ggplot2::ggplot(contribution_data, ggplot2::aes(x = "", y = n, fill = category)) +
+  ggplot2::geom_col(width = 0.5, color = "white", size = 0.5) +
+  # labels for large proportions (inside)
+  ggplot2::geom_text(
+    data = contribution_data |> dplyr::filter(label_pos == "inside"),
+    ggplot2::aes(label = label_text),
+    position = ggplot2::position_stack(vjust = 0.5),
+    color = "black",
+    fontface = "bold"
+  ) +
+  # labels for small proportions (to the side)
+  ggplot2::geom_text(
+    data = contribution_data |> dplyr::filter(label_pos == "outside"),
+    ggplot2::aes(label = label_text, y = sum(contribution_data$n)), # position at top
+    x = 1.3, # to the right of the bar
+    color = "black",
+    fontface = "bold",
+    hjust = 0
+  ) +
+  ggplot2::scale_fill_manual(values = contribution_colors) +
+  ggplot2::scale_y_continuous(
+    breaks = seq(from = 0, to = ceiling(nrow(dwr_pubs) / 100) * 100, by = 100)
+  ) +
+  ggplot2::labs(
+    title = "DWR publications by contribution type",
+    fill = "Contribution type",
+    x = NULL,
+    y = "number of publications"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    plot.title       = ggplot2::element_text(face = "bold", size = 16),
+    plot.subtitle    = ggplot2::element_text(face = "italic", size = 12),
+    legend.position  = "right",
+    legend.title     = ggplot2::element_text(face = "bold", size = 14),
+    legend.text      = ggplot2::element_text(size = 12),
+    panel.grid.minor = ggplot2::element_blank(),
+    axis.title.x     = ggplot2::element_text(face = "bold", size = 14, margin = ggplot2::margin(t = 20)),
+    axis.title.y     = ggplot2::element_text(face = "bold", size = 14, margin = ggplot2::margin(r = 20)),
+    axis.text.x      = ggplot2::element_text(size = 12),
+    axis.text.y      = ggplot2::element_text(size = 12)
+  )
+```
+
+## Division author contributions
+
+```{r prep-divisions, include = FALSE}
+division_counts <- dwr_pubs |> 
+  dplyr::filter(!is.na(division)) |>
+  dplyr::count(division, sort = TRUE)
+```
+
+In the case of DWR authorship, publications were assigned a DWR division based
+on the divisional affiliation of the highest-ranking author. To add the division
+information, author names were fuzzy-matched with a roster of all employees,
+divisions, and years since 2020. DWR authors are spread across
+`r length(unique(dwr_pubs$division))` divisions. The division that has published
+the greatest number of manuscripts is `r division_counts$division[1]`
+
+```{r visualize-divisions, echo = FALSE, fig.width = 10, fig.height = 6}
+ggplot2::ggplot(
+  division_counts,
+  ggplot2::aes(x = factor(division, levels = rev(division)), y = n)
+) +
+  ggplot2::geom_col(fill = "black", alpha = 0.8, width = 0.5) +
+  ggplot2::geom_text(ggplot2::aes(label = n), hjust = -0.2) +
+  ggplot2::scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 20)) +
+  ggplot2::coord_flip() +
+  ggplot2::labs(
+    title = "DWR publications by division",
+    x = NULL,
+    y = "number of publications"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(face = "bold", size = 16),
+    axis.title.x = ggplot2::element_text(
+      face = "bold",
+      size = 14,
+      margin = ggplot2::margin(t = 20)
+    ),
+    axis.text.x = ggplot2::element_text(size = 12),
+    axis.text.y = ggplot2::element_text(size = 12)
+  )
+```
+
 
 # Large language model classification
 
@@ -355,7 +472,7 @@ top_two <- dplyr::count(dwr_pubs_classified, first_level) |>
   dplyr::pull(first_level)
 
 # pick a few smaller fields to mention
-small_fields <- c("agronomy", "genetics", "political science")
+small_fields <- c("social sciences", "mathematics and statistics")
 small_max <- dplyr::count(dwr_pubs_classified, pub_year, first_level) |>
   dplyr::filter(first_level %in% small_fields) |>
   dplyr::pull(n) |>
