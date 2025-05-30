@@ -7,5 +7,5 @@ docs
 .DS_Store
 .quarto
 
-data-raw/employee_division_year.xlsx
-data/employees_divisions.rda
+data-raw/dwr_employee_division_year.xlsx
+data/dwr_employees_divisions.rda

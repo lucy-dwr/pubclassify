@@ -1,8 +1,8 @@
 # import a file of employees and associated divisions; note that this file is
 # not hosted on GitHub for privacy reasons, but the cleaning is displayed here
 # for transparency
-employees_divisions <- readxl::read_xlsx(
-  path = here::here("data-raw", "employee_division_year.xlsx"),
+dwr_employees_divisions <- readxl::read_xlsx(
+  path = here::here("data-raw", "dwr_employee_division_year.xlsx"),
   col_names = c("employee", "division", "year", "division_old"),
   col_types = c("text", "text", "numeric", "text"),
   skip = 1
@@ -22,8 +22,8 @@ clean_names_case <- function(x) {
 }
 
 # clean the names
-employees_divisions <- employees_divisions |>
+dwr_employees_divisions <- dwr_employees_divisions |>
   dplyr::mutate(employee = clean_names_case(employee))
 
 # write out
-usethis::use_data(employees_divisions, overwrite = TRUE)
+usethis::use_data(dwr_employees_divisions, overwrite = TRUE)
