@@ -1,0 +1,28 @@
+Package: pubclassify
+Title: Retrieve and Classify Bibliometric Publication Metadata
+Version: 0.0.0.9000
+Authors@R:
+    person("Lucy", "Andrews", , "lucy.andrews@water.ca.gov", role = c("aut", "cre"))
+Description: Retrieve peer-reviewed publication metadata from bibliometric
+    APIs including OpenAlex, Scopus, and Crossref, with support for
+    classifying publications into user-defined scholarly field taxonomies
+    using large language models.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1.0)
+Imports:
+    cli,
+    dplyr,
+    ellmer,
+    httr2,
+    jsonlite,
+    rlang,
+    tibble
+Suggests:
+    httptest2,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
