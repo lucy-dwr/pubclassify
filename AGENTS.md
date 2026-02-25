@@ -105,7 +105,7 @@ sensitive — it grants off-campus institutional access.
 ## Stub files
 
 Propose an implementation plan and get explicit approval before writing any code
-in stub files.
+in stub files (`R/classify.R`, `R/search_crossref.R`).
 
 ---
 
@@ -125,7 +125,7 @@ Before declaring any change complete:
 ## When to ask vs. proceed
 
 **Ask first** when the change touches more than two files, requires a new
-dependency, involves a stub file, or the prompt or correct approach is genuinely
+dependency, involves a stub file, or the correct approach is genuinely
 ambiguous.
 
 **Proceed directly** for single-function fixes, documentation edits, and new
