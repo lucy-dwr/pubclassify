@@ -11,15 +11,17 @@ NULL
 # Every source-specific parser returns rows conforming to this layout
 .pc_empty_result <- function() {
   tibble::tibble(
-    doi          = character(),
-    title        = character(),
-    abstract     = character(),
-    year         = integer(),
-    authors      = list(),   # list of character vectors
-    affiliations = list(),   # list of character vectors
-    funders      = list(),   # list of character vectors
-    journal      = character(),
-    source       = character()
+    doi           = character(),
+    title         = character(),
+    abstract      = character(),
+    year          = integer(),
+    doc_type      = character(),
+    authors       = list(),   # list of character vectors
+    affiliations  = list(),   # list of character vectors
+    funders       = list(),   # list of character vectors
+    grant_numbers = list(),   # list of character vectors
+    journal       = character(),
+    source        = character()
   )
 }
 
