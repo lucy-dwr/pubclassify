@@ -1,0 +1,19 @@
+{
+  "meta": { "count": 2 },
+  "results": [
+    {
+      "id": "https://openalex.org/F4320308027",
+      "display_name": "California Department of Water Resources",
+      "country_code": "us",
+      "works_count": 412,
+      "description": "State water agency"
+    },
+    {
+      "id": "https://openalex.org/F4320308028",
+      "display_name": "California Natural Resources Agency",
+      "country_code": "us",
+      "works_count": 88,
+      "description": null
+    }
+  ]
+}

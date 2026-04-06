@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "count": 2,
+    "per_page": 200,
+    "next_cursor": null
+  },
+  "results": [
+    {
+      "doi": "https://doi.org/10.1000/test.001",
+      "title": "Climate change and delta smelt",
+      "abstract_inverted_index": {
+        "This": [0],
+        "study": [1],
+        "examines": [2],
+        "salinity": [3]
+      },
+      "publication_year": 2022,
+      "authorships": [
+        {
+          "author": { "display_name": "Gaal Dornick" },
+          "institutions": [
+            { "display_name": "University of California" }
+          ]
+        },
+        {
+          "author": { "display_name": "Salvor Hardin" },
+          "institutions": [
+            { "display_name": "USGS" },
+            { "display_name": "UC Davis" }
+          ]
+        }
+      ],
+      "awards": [
+        { "funder_display_name": "California Dept of Water Resources", "award_id": "4600012345" }
+      ],
+      "primary_location": {
+        "source": { "display_name": "Nature Sustainability" }
+      }
+    },
+    {
+      "doi": "https://doi.org/10.1000/test.002",
+      "title": "Salmon habitat restoration",
+      "abstract_inverted_index": {
+        "Habitat": [0],
+        "restoration": [1],
+        "improves": [2],
+        "fish": [3],
+        "passage": [4]
+      },
+      "publication_year": 2023,
+      "authorships": [
+        {
+          "author": { "display_name": "Alice Wong" },
+          "institutions": [
+            { "display_name": "Stanford University" }
+          ]
+        }
+      ],
+      "awards": [],
+      "primary_location": {
+        "source": { "display_name": "Restoration Ecology" }
+      }
+    }
+  ]
+}

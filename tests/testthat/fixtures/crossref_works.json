@@ -1,0 +1,46 @@
+{
+  "message": {
+    "total-results": 2,
+    "next-cursor": null,
+    "items": [
+      {
+        "DOI": "10.1000/crossref.001",
+        "title": ["Groundwater recharge under climate change"],
+        "abstract": "<jats:p>This paper examines recharge rates.</jats:p>",
+        "published-print": { "date-parts": [[2022, 4, 1]] },
+        "container-title": ["Water Resources Research"],
+        "author": [
+          {
+            "given": "Hari",
+            "family": "Seldon",
+            "affiliation": [{ "name": "Arizona State University" }]
+          },
+          {
+            "given": "Ebling",
+            "family": "Mis",
+            "affiliation": []
+          }
+        ],
+        "funder": [
+          { "name": "US Geological Survey" },
+          { "name": "NSF" }
+        ]
+      },
+      {
+        "DOI": "10.1000/crossref.002",
+        "title": ["Riparian buffer effectiveness"],
+        "abstract": null,
+        "published-online": { "date-parts": [[2023, 9, 15]] },
+        "container-title": ["Journal of Hydrology"],
+        "author": [
+          {
+            "given": "Han",
+            "family": "Pritcher",
+            "affiliation": [{ "name": "Oregon State University" }]
+          }
+        ],
+        "funder": []
+      }
+    ]
+  }
+}

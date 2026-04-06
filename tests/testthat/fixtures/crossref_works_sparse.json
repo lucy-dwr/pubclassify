@@ -1,0 +1,31 @@
+{
+  "message": {
+    "total-results": 2,
+    "items": [
+      {
+        "DOI": "10.1000/crossref.sparse",
+        "title": ["No authors or funders"],
+        "abstract": null,
+        "published-print": { "date-parts": [[2020, 1, 1]] },
+        "container-title": ["Some Journal"],
+        "author": [],
+        "funder": []
+      },
+      {
+        "DOI": null,
+        "title": [],
+        "abstract": "<jats:p>   </jats:p>",
+        "published-online": { "date-parts": [[2021]] },
+        "container-title": [],
+        "author": [
+          {
+            "given": "",
+            "family": "Anonymous",
+            "affiliation": [{ "name": null }]
+          }
+        ],
+        "funder": [{ "name": null }]
+      }
+    ]
+  }
+}

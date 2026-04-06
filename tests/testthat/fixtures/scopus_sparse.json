@@ -1,0 +1,31 @@
+{
+  "search-results": {
+    "opensearch:totalResults": "2",
+    "entry": [
+      {
+        "prism:doi": null,
+        "dc:title": "No DOI Scopus record",
+        "dc:description": null,
+        "prism:coverDate": null,
+        "prism:publicationName": "Unknown Journal",
+        "dc:creator": null,
+        "author": [],
+        "affiliation": [],
+        "fund-sponsor": null,
+        "fund-no": null,
+        "subtypeDescription": null
+      },
+      {
+        "prism:doi": "10.1000/scopus.sparse",
+        "dc:title": "Sparse funding metadata",
+        "dc:description": "Short abstract.",
+        "prism:coverDate": "2021-01-01",
+        "prism:publicationName": "Marine Ecology",
+        "dc:creator": "Demerzel, E.",
+        "fund-sponsor": "",
+        "fund-no": "",
+        "subtypeDescription": "Article"
+      }
+    ]
+  }
+}

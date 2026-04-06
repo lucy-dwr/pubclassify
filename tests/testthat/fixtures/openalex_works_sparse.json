@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "count": 3,
+    "per_page": 200,
+    "next_cursor": null
+  },
+  "results": [
+    {
+      "doi": null,
+      "title": "No DOI record",
+      "abstract_inverted_index": null,
+      "publication_year": 2021,
+      "authorships": [],
+      "awards": [],
+      "primary_location": {
+        "source": { "display_name": "Some Journal" }
+      }
+    },
+    {
+      "doi": "https://doi.org/10.1000/test.sparse",
+      "title": null,
+      "abstract_inverted_index": {},
+      "publication_year": null,
+      "authorships": [
+        {
+          "author": { "display_name": null },
+          "institutions": []
+        }
+      ],
+      "awards": [
+        { "funder_display_name": null, "award_id": null }
+      ],
+      "primary_location": null
+    },
+    {
+      "doi": "https://doi.org/10.1000/test.003",
+      "title": "Multi-word abstract reconstruction",
+      "abstract_inverted_index": {
+        "water": [0, 3],
+        "quantity": [1],
+        "affects": [2],
+        "quality": [4]
+      },
+      "publication_year": 2020,
+      "authorships": [],
+      "awards": [],
+      "primary_location": {
+        "source": null
+      }
+    }
+  ]
+}

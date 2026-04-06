@@ -1,0 +1,27 @@
+{
+  "search-results": {
+    "opensearch:totalResults": "2",
+    "entry": [
+      {
+        "prism:doi": "10.1000/scopus.001",
+        "dc:title": "Estuarine ecology review",
+        "prism:coverDate": "2022-06-01",
+        "prism:publicationName": "Estuarine, Coastal and Shelf Science",
+        "dc:creator": "Darell, B.",
+        "affiliation": [
+          { "affilname": "UC Santa Cruz" }
+        ],
+        "subtypeDescription": "Article"
+      },
+      {
+        "prism:doi": "10.1000/scopus.002",
+        "dc:title": "Tidal marsh carbon sequestration",
+        "prism:coverDate": "2023-03-15",
+        "prism:publicationName": "Global Change Biology",
+        "dc:creator": "Lee, K.",
+        "affiliation": [],
+        "subtypeDescription": "Review"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "search-results": {
+    "opensearch:totalResults": "2",
+    "entry": [
+      {
+        "prism:doi": "10.1000/scopus.001",
+        "dc:title": "Estuarine ecology review",
+        "dc:description": "A review of estuarine ecology methods.",
+        "prism:coverDate": "2022-06-01",
+        "prism:publicationName": "Estuarine, Coastal and Shelf Science",
+        "dc:creator": "Darell, B.",
+        "author": [
+          { "authname": "Darell, B." },
+          { "authname": "Riose, B." }
+        ],
+        "affiliation": [
+          { "affilname": "UC Santa Cruz" },
+          { "affilname": "NOAA" }
+        ],
+        "fund-sponsor": "National Science Foundation",
+        "fund-no": "OCE-1234567",
+        "subtypeDescription": "Article"
+      },
+      {
+        "prism:doi": "10.1000/scopus.002",
+        "dc:title": "Tidal marsh carbon sequestration",
+        "dc:description": "Carbon storage in tidal marshes.",
+        "prism:coverDate": "2023-03-15",
+        "prism:publicationName": "Global Change Biology",
+        "dc:creator": "Lee, K.",
+        "author": [
+          { "authname": "Lee, K." }
+        ],
+        "affiliation": [
+          { "affilname": "Woods Hole Oceanographic Institution" }
+        ],
+        "fund-sponsor": ["Dept of Energy", "NSF"],
+        "fund-no": ["DE-SC0001", "DEB-9876543"],
+        "subtypeDescription": "Review"
+      }
+    ]
+  }
+}
