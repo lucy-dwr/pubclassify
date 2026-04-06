@@ -9,11 +9,20 @@
 #'   to `PUBCLASSIFY_EMAIL`.
 #' @param scopus_key Character. Elsevier Scopus API key. If `NULL`, falls back
 #'   to the `SCOPUS_API_KEY` environment variable.
+#' @param scopus_insttoken Character. Elsevier institutional token, used
+#'   alongside `scopus_key` to authenticate off-campus COMPLETE view access.
+#'   If `NULL`, falls back to the `SCOPUS_INSTTOKEN` environment variable.
+#'   Keep this value confidential — do not commit it to version control.
 #' @param llm_key Character. API key for the LLM provider used by
 #'   [pc_classify()]. If `NULL`, falls back to the provider-specific
 #'   environment variable (e.g. `ANTHROPIC_API_KEY`).
 #' @param llm_provider Character. LLM provider name passed to `ellmer`
 #'   (e.g. `"anthropic"`, `"openai"`). Default `"anthropic"`.
+#' @param llm_base_url Character. Base URL for an OpenAI-compatible API
+#'   endpoint. Use this when calling a non-standard provider (e.g. a local
+#'   model server or a third-party OpenAI-compatible service). If `NULL`,
+#'   the provider's default endpoint is used. Falls back to the
+#'   `PUBCLASSIFY_LLM_BASE_URL` environment variable.
 #' @param embed_key Character. API key for the embedding provider used when
 #'   `use_embeddings = TRUE` in [pc_classify()]. If `NULL`, falls back to
 #'   the provider-specific environment variable.
@@ -35,21 +44,25 @@
 #' )
 #' }
 pc_configure <- function(
-    email          = NULL,
-    scopus_key     = NULL,
-    llm_key        = NULL,
-    llm_provider   = "anthropic",
-    embed_key      = NULL,
-    embed_provider = NULL,
-    .overwrite     = TRUE
+    email             = NULL,
+    scopus_key        = NULL,
+    scopus_insttoken  = NULL,
+    llm_key           = NULL,
+    llm_provider      = "anthropic",
+    llm_base_url      = NULL,
+    embed_key         = NULL,
+    embed_provider    = NULL,
+    .overwrite        = TRUE
 ) {
   args <- list(
-    email          = email,
-    scopus_key     = scopus_key,
-    llm_key        = llm_key,
-    llm_provider   = llm_provider,
-    embed_key      = embed_key,
-    embed_provider = embed_provider
+    email             = email,
+    scopus_key        = scopus_key,
+    scopus_insttoken  = scopus_insttoken,
+    llm_key           = llm_key,
+    llm_provider      = llm_provider,
+    llm_base_url      = llm_base_url,
+    embed_key         = embed_key,
+    embed_provider    = embed_provider
   )
 
   for (nm in names(args)) {
@@ -74,9 +87,9 @@ pc_configure <- function(
 #' @examples
 #' pc_config()
 pc_config <- function() {
-  key_fields <- c("scopus_key", "llm_key", "embed_key")
-  nms <- c("scopus_key", "email", "llm_key", "llm_provider",
-           "embed_key", "embed_provider")
+  key_fields <- c("scopus_key", "scopus_insttoken", "llm_key", "embed_key")
+  nms <- c("scopus_key", "scopus_insttoken", "email", "llm_key", "llm_provider",
+           "llm_base_url", "embed_key", "embed_provider")
 
   cfg <- lapply(setNames(nms, nms), function(nm) {
     val <- .pc_env[[nm]]
@@ -137,15 +150,17 @@ pc_save_config <- function(
   scope <- rlang::arg_match(scope)
 
   # Mapping: .pc_env field name → .Renviron variable name
-  # Key fields (values masked in output): scopus_key, llm_key, embed_key
-  key_fields  <- c("scopus_key", "llm_key", "embed_key")
+  # Key fields (values masked in output): scopus_key, scopus_insttoken, llm_key, embed_key
+  key_fields  <- c("scopus_key", "scopus_insttoken", "llm_key", "embed_key")
   env_var_map <- c(
-    email          = "PUBCLASSIFY_EMAIL",
-    scopus_key     = "SCOPUS_API_KEY",
-    llm_key        = "PUBCLASSIFY_LLM_KEY",
-    llm_provider   = "PUBCLASSIFY_LLM_PROVIDER",
-    embed_key      = "PUBCLASSIFY_EMBED_KEY",
-    embed_provider = "PUBCLASSIFY_EMBED_PROVIDER"
+    email             = "PUBCLASSIFY_EMAIL",
+    scopus_key        = "SCOPUS_API_KEY",
+    scopus_insttoken  = "SCOPUS_INSTTOKEN",
+    llm_key           = "PUBCLASSIFY_LLM_KEY",
+    llm_provider      = "PUBCLASSIFY_LLM_PROVIDER",
+    llm_base_url      = "PUBCLASSIFY_LLM_BASE_URL",
+    embed_key         = "PUBCLASSIFY_EMBED_KEY",
+    embed_provider    = "PUBCLASSIFY_EMBED_PROVIDER"
   )
 
   # Collect values that are currently set in .pc_env
