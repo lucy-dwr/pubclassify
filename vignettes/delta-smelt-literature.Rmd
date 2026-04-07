@@ -1,0 +1,569 @@
+---
+title: "Delta Smelt Literature"
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Delta Smelt Literature}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r taxonomy-data, echo = FALSE}
+# Single source of truth for the classification taxonomy.
+# The display in "Step 2" and the pc_taxonomy object passed to pc_classify()
+# are both generated from this list — edit here to update both.
+.categories <- list(
+  list(
+    name       = "Life Cycle Models",
+    definition = paste(
+      "Studies that develop or apply integrated models linking multiple life",
+      "stages of delta smelt to environmental conditions, management actions,",
+      "or population dynamics."
+    ),
+    includes   = c(
+      "Stage-structured population models",
+      "Individual-based models (IBMs)",
+      "Full or partial life cycle models (linking 2 or more life stages)",
+      "Population viability or forecasting models",
+      "Bioenergetic models"
+    ),
+    excludes   = c(
+      "Models focused on a single process (e.g. only habitat or only entrainment)",
+      "Purely statistical correlations without life cycle structure"
+    ),
+    signals    = c(
+      '"life cycle model"', '"stage-structured"', '"individual-based model"',
+      '"recruitment"', '"survival across life stages"', '"reproduction"',
+      '"abundance index"', '"population growth"',
+      '"population dynamics"', '"population projection"'
+    ),
+    tiebreak   = paste(
+      "If a study models multiple life stages together, classify here --",
+      "even if it includes habitat or entrainment components."
+    )
+  ),
+  list(
+    name       = "Entrainment",
+    definition = paste(
+      "Studies focused on the transport, loss, or mortality of delta smelt",
+      "due to water infrastructure or hydrodynamic processes, especially",
+      "related to pumping, diversion, or flow operations."
+    ),
+    includes   = c(
+      "Export facility entrainment (SWP/CVP)",
+      "Fish salvage facility (SWP/CVP)",
+      "Salvage-based analyses",
+      "Hydrodynamic drivers of entrainment risk",
+      "Behavioral positioning tied to entrainment vulnerability",
+      "Quantification or modeling of entrainment losses",
+      "Proportional population loss due to entrainment"
+    ),
+    excludes   = c(
+      "General hydrodynamics not linked to fish entrainment risk",
+      "Habitat studies where entrainment is not central",
+      "Predation discussed in the context of SWP/CVP"
+    ),
+    signals    = c(
+      '"entrainment"', '"salvage"', '"export pumps"', '"diversion"',
+      '"Old and Middle River (OMR) flow"', '"loss"',
+      '"mortality due to pumping"', '"Clifton Court Forebay"'
+    ),
+    tiebreak   = paste(
+      "If the study's primary question is about risk or magnitude of",
+      "entrainment or proportional population loss, classify here --",
+      "even if habitat or behavior is analyzed."
+    )
+  ),
+  list(
+    name       = "Summer-Fall Habitat",
+    definition = paste(
+      "Studies examining how habitat conditions during June-December influence",
+      "delta smelt distribution, survival, or population dynamics, including",
+      "evaluation of management actions that modify these conditions."
+    ),
+    includes   = c(
+      "Effects of temperature, salinity, turbidity, or prey during summer-fall",
+      "X2 relationships (location in km from Golden Gate where salinity = 2 ppt)",
+      "Suisun Marsh Salinity Control Gates (SMSCG)",
+      "Managed wetlands affecting summer-fall habitat",
+      "Seasonal habitat suitability or occupancy models",
+      "Low salinity zone area and position"
+    ),
+    excludes   = c(
+      "Habitat studies focused on other seasons (e.g. spawning)",
+      "General habitat studies without seasonal emphasis"
+    ),
+    signals    = c(
+      '"summer"', '"fall"', '"June-December"', '"summer-fall"',
+      '"X2"', '"low salinity zone"', '"Suisun Marsh"', '"salinity control gates"'
+    ),
+    tiebreak   = paste(
+      "If the study is primarily about delta smelt and habitat conditions",
+      "in the summer-fall period, classify here -- even if modeling or",
+      "monitoring tools are used."
+    )
+  ),
+  list(
+    name       = "General Biology",
+    definition = paste(
+      "Studies describing the basic biology, ecology, or life history of",
+      "delta smelt, without a primary focus on management actions,",
+      "entrainment, or life cycle-integrated modeling."
+    ),
+    includes   = c(
+      "Growth, reproduction, fecundity",
+      "Feeding ecology and diet",
+      "Behavior (not tied to entrainment)",
+      "Physiological tolerances and distribution (temperature, salinity, etc.)",
+      "Laboratory or field studies of life history traits",
+      "Life history, competitors, predators"
+    ),
+    excludes   = c(
+      "Studies primarily focused on management interventions",
+      "Monitoring or tool development",
+      "Life cycle models"
+    ),
+    signals    = c(
+      '"growth"', '"diet"', '"fecundity"', '"spawning"',
+      '"physiology"', '"tolerance"', '"laboratory experiment"',
+      '"ecology"', '"life history"', '"habitat suitability"'
+    ),
+    tiebreak   = "Use as the default when no other category is clearly dominant."
+  ),
+  list(
+    name       = "Monitoring Tools",
+    definition = paste(
+      "Studies that develop, test, or apply methods or technologies",
+      "specifically designed or validated for detecting, tracking, or",
+      "estimating delta smelt or their environment, where the method itself",
+      "is the primary contribution."
+    ),
+    includes   = c(
+      "eDNA development and validation",
+      "Genomic monitoring tools",
+      "Tagging and telemetry methods",
+      "Survey design, detection tools, and detection probability",
+      "Novel observational or analytical techniques",
+      "Sampling gear efficiency"
+    ),
+    excludes   = c(
+      "Studies using standard monitoring data to answer ecological questions",
+      "Papers where the tool is secondary to a biological or management question",
+      "General-purpose statistical or bioinformatics methods that use delta smelt only as an example dataset"
+    ),
+    signals    = c(
+      '"eDNA"', '"genomic"', '"PCR"', '"assay"',
+      '"tagging"', '"telemetry"', '"acoustic"', '"dye"',
+      '"method development"', '"validation"', '"detection probability"'
+    ),
+    tiebreak   = paste(
+      "Apply this binary test: 'Would this method exist, unchanged, if delta",
+      "smelt had never been used as the example dataset?' If yes, classify as",
+      "Incidental Mention. If no (the method was built for delta smelt",
+      "monitoring), classify here. If the method is used to answer an",
+      "ecological question, classify by that question instead."
+    )
+  ),
+  list(
+    name       = "Culture and Reintroduction",
+    definition = paste(
+      "Studies that develop methods and best practice for raising delta smelt",
+      "in captivity, including maintaining genetic diversity in a captive",
+      "population, or that evaluate experimental approaches to reintroducing",
+      "cultured delta smelt into their natural environment."
+    ),
+    includes   = c(
+      "Cultured or captive-reared delta smelt populations",
+      "Delta smelt supplementation programs",
+      "Hatchery genetic management plans",
+      "Broodstock collection",
+      "Reintroduction, release techniques, and release enclosures",
+      "Fish Conservation and Culture Laboratory studies"
+    ),
+    excludes   = c(
+      "Salmon hatchery or salmon broodstock studies"
+    ),
+    signals    = c(
+      '"captive"', '"hatchery"', '"broodstock"', '"reintroduction"',
+      '"supplementation"', '"Fish Conservation and Culture Laboratory"',
+      '"release enclosure"'
+    ),
+    tiebreak   = NULL
+  ),
+  list(
+    name       = "Social Science",
+    definition = paste(
+      "Studies that examine delta smelt conservation, management, or water",
+      "policy through a social science lens, including economic analyses,",
+      "governance and institutional studies, policy evaluation, stakeholder",
+      "engagement, and the human dimensions of resource management decisions",
+      "affecting delta smelt."
+    ),
+    includes   = c(
+      "Water policy and regulatory analysis related to delta smelt (ESA listings, biological opinions, water allocation decisions)",
+      "Economic valuation of delta smelt conservation or water management decisions",
+      "Cost-benefit analyses of management actions (water exports, flow restrictions, habitat restoration)",
+      "Stakeholder conflict, negotiation, and collaborative governance of the Sacramento-San Joaquin Delta",
+      "Environmental law and litigation related to delta smelt",
+      "Public perception, attitudes, and values related to delta smelt or Delta water management",
+      "Environmental justice and equity in Delta water governance",
+      "Historical and political analysis of delta smelt conservation"
+    ),
+    excludes   = c(
+      "Biological studies that mention policy implications without analyzing them",
+      "Technical hydrological or biological assessments used to inform policy (classify by the biological category)",
+      "Water operations studies focused on physical outcomes rather than governance or human dimensions"
+    ),
+    signals    = c(
+      '"water policy"', '"water management"', '"water allocation"',
+      '"Endangered Species Act"', '"ESA"', '"biological opinion"', '"BiOp"',
+      '"stakeholder"', '"governance"', '"regulatory"', '"compliance"',
+      '"economic"', '"socioeconomic"', '"cost-benefit"', '"valuation"',
+      '"litigation"', '"court"', '"legal"',
+      '"public perception"', '"attitudes"', '"survey respondents"'
+    ),
+    tiebreak   = paste(
+      "If the primary research question concerns human decisions, institutions,",
+      "values, or economic trade-offs related to delta smelt or Delta water",
+      "management, classify here -- even if biological data are referenced."
+    )
+  ),
+  list(
+    name       = "Incidental Mention",
+    definition = paste(
+      "Publications where delta smelt appears in the abstract but is not a",
+      "primary subject of study. For example, the abstract lists delta smelt",
+      "alongside many other species, references it as ecological background,",
+      "or names it incidentally without describing delta smelt-focused methods",
+      "or findings."
+    ),
+    includes   = c(
+      "Multi-species surveys where delta smelt is one of many listed species",
+      "Papers citing delta smelt only as context or background",
+      "General-purpose statistical or computational tools where delta smelt data is used only to illustrate the method (e.g., software for estimating effective population size, demographic inference tools, or population genetics methods applied to delta smelt as a convenient dataset)"
+    ),
+    excludes   = c(
+      "Any paper with smelt-focused methods, analyses, or findings"
+    ),
+    signals    = c(
+      "Delta smelt listed among many species without dedicated analysis",
+      "Smelt mentioned only in introduction or discussion as context",
+      "Delta smelt used as an example or case study dataset for a broadly applicable method (apply the binary test: would this method exist unchanged without delta smelt data?)",
+      "General population genetics or statistical software illustrated with delta smelt data"
+    ),
+    tiebreak   = NULL
+  )
+)
+
+# Build the LLM-ready definition string for each category.
+.make_def <- function(x) {
+  parts <- c(
+    x$definition,
+    paste0("Includes: ", paste(x$includes, collapse = "; "), "."),
+    paste0("Excludes: ", paste(x$excludes, collapse = "; "), "."),
+    paste0("Key signals: ", paste(x$signals, collapse = ", "), ".")
+  )
+  if (!is.null(x$tiebreak)) {
+    parts <- c(parts, paste0("Tie-break: ", x$tiebreak))
+  }
+  paste(parts, collapse = " ")
+}
+
+taxonomy <- pubclassify::pc_taxonomy(data.frame(
+  field      = vapply(.categories, `[[`, character(1L), "name"),
+  definition = vapply(.categories, .make_def, character(1L)),
+  stringsAsFactors = FALSE
+))
+```
+
+```{r prompt-data, echo = FALSE}
+# System prompt and classification instructions.
+# These are displayed as prose below and passed directly to pc_classify().
+system_prompt <- paste(
+  "You are a scientific literature classifier specializing in aquatic",
+  "ecology. You will be given a list of published peer-reviewed manuscripts",
+  "with titles and abstracts, plus a taxonomy of research categories.",
+  "Assign each manuscript to one primary category based on the central",
+  "research objective (i.e., what the study is primarily trying to",
+  "understand or estimate), not just the data, methods, or variables used.",
+  "If multiple categories apply equally, use the priority rules provided to",
+  "select the best-fitting primary category."
+)
+
+.priority <- c(
+  "**Life Cycle Models** -- if multi-stage population modeling is central",
+  "**Entrainment** -- if infrastructure-related loss or risk is central",
+  "**Summer-Fall Habitat** -- if summer and/or fall habitat (June--December) is central",
+  "**Monitoring Tools** -- if method development is central",
+  "**Culture and Reintroduction** -- if captive rearing and reintroduction is central",
+  "**Social Science** -- if policy, economics, governance, or human dimensions is central",
+  "**General Biology** -- fallback/default",
+  "**Incidental Mention** -- if delta smelt is not the primary focus"
+)
+
+classify_instructions <- paste(
+  "When multiple categories are present, apply this priority order:",
+  paste(seq_along(.priority), .priority, sep = ". ", collapse = "\n"),
+  "",
+  "When uncertain, prefer the category that best answers:",
+  "'What is the main question this paper is trying to answer?'",
+  "",
+  "Do NOT classify based solely on data type (e.g. eDNA, survey data) or",
+  "methods used (e.g. modeling, statistics).",
+  "Classify based on the scientific objective.",
+  sep = "\n"
+)
+```
+
+## Overview
+
+This vignette demonstrates how to retrieve and classify the peer-reviewed
+literature on delta smelt (*Hypomesus transpacificus*) using the `pubclassify`
+R package.
+
+The workflow has four steps:
+
+1. **Search** Scopus for articles that mention delta smelt in their abstract.
+2. **Define** an eight-category taxonomy and the classification prompts.
+3. **Classify** each paper using a large language model.
+4. **Summarize** the distribution of papers across categories.
+
+---
+
+## Setup
+
+Store credentials with `pc_configure()`. The Scopus key and LLM key should
+come from environment variables; the base URL points to an OpenAI-compatible
+endpoint hosted by the California Department of Technology.
+
+```{r configure, eval = FALSE}
+pubclassify::pc_configure(
+  scopus_key   = Sys.getenv("SCOPUS_API_KEY"),
+  llm_key      = Sys.getenv("PUBCLASSIFY_LLM_KEY"),
+  llm_base_url = "https://customeruat.sda.state.ca.gov/api/v1",
+  llm_provider = "openai-compatible"
+)
+```
+
+---
+
+## Step 1: Search Scopus
+
+Search for peer-reviewed articles where "delta smelt" appears in the abstract.
+Grey literature and reports that have not been peer-reviewed (as determined by
+Scopus) are excluded.
+
+```{r search, eval = FALSE}
+pubs <- pubclassify::pc_search_scopus(
+  query    = "delta smelt",
+  field    = "abstract",
+  doc_type = "article"
+)
+```
+
+---
+
+## Step 2: Classification Taxonomy
+
+Papers are classified into eight categories. Each category is defined below
+with the key concepts it covers, what it explicitly excludes, and signal
+phrases that help the LLM distinguish it from adjacent categories.
+
+```{r taxonomy-display, echo = FALSE, results = 'asis'}
+for (i in seq_along(.categories)) {
+  x <- .categories[[i]]
+  cat(paste0("### ", i, ". ", x$name, "\n\n"))
+  cat(x$definition, "\n\n")
+  cat("**Includes:** ", paste(x$includes, collapse = "; "), "\n\n")
+  cat("**Excludes:** ", paste(x$excludes, collapse = "; "), "\n\n")
+  cat("**Key signals:** ", paste(x$signals, collapse = ", "), "\n\n")
+  if (!is.null(x$tiebreak)) {
+    cat("> *Tie-break:* ", x$tiebreak, "\n\n")
+  }
+  cat("---\n\n")
+}
+```
+
+## Step 3: Classification Prompts
+
+Classification is guided by two prompts passed to `pc_classify()`.
+
+### System Prompt
+
+The system prompt defines the model's role and is sent with every batch call.
+It establishes that classification should be based on the central scientific
+objective of a study, not on the data type or methods used.
+
+```{r system-prompt-display, echo = FALSE, results = 'asis'}
+cat("> *", gsub(" +", " ", gsub("\n", " ", system_prompt)), "*\n\n", sep = "")
+```
+
+### Classification Instructions
+
+The classification instructions are injected alongside the taxonomy in each
+batch call. They provide domain-specific priority rules for resolving cases
+where a paper could plausibly belong to more than one category.
+
+```{r classify-instructions-display, echo = FALSE, results = 'asis'}
+cat("> *When multiple categories apply, use this priority order:*\n>\n")
+for (i in seq_along(.priority)) {
+  cat(paste0("> *", i, ". ", .priority[[i]], "*\n>\n"))
+}
+cat(
+  "> *When uncertain, prefer the category that best answers: ",
+  "\"What is the main question this paper is trying to answer?\"*\n>\n",
+  "> *Do not classify based solely on data type (e.g. eDNA, survey data) ",
+  "or methods used (e.g. modeling, statistics). ",
+  "Classify based on the scientific objective.*\n\n",
+  sep = ""
+)
+```
+
+---
+
+## Step 4: Classify
+
+Each paper's title and abstract are sent to the LLM in batches of 10.
+The model assigns one category and a one-sentence rationale per paper.
+Results are saved to disk so they can be reloaded without re-running the
+API calls.
+
+```{r classify, eval = FALSE}
+classified <- pubclassify::pc_classify(
+  pubs                  = pubs,
+  taxonomy              = taxonomy,
+  provider              = "openai-compatible",
+  model                 = "Anthropic Claude Sonnet 4.5",
+  system_prompt         = system_prompt,
+  classify_instructions = classify_instructions
+)
+```
+
+```{r save-cache, eval = FALSE, echo = FALSE}
+saveRDS(classified, "vignettes/delta_smelt_classified.rds")
+```
+
+---
+
+## Results
+
+```{r load-cache, include = FALSE}
+classified <- readRDS("delta_smelt_classified.rds") |> 
+  dplyr::select(-authors, -affiliations, -funders, -grant_numbers)
+```
+
+The search returned `r nrow(classified)` peer-reviewed articles. After
+classification, the distribution across substantive research categories is:
+
+```{r summary}
+classified |>
+  dplyr::filter_out(pc_field == "Incidental Mention") |>
+  dplyr::count(Category = pc_field, name = "Papers") |>
+  dplyr::arrange(dplyr::desc(Papers)) |>
+  knitr::kable(
+    booktabs = TRUE,
+    linesep = "",
+    caption = "Distribution of delta smelt literature by research category."
+  )
+```
+
+```{r incidental, echo = FALSE}
+n_incidental <- sum(classified$pc_field == "Incidental Mention")
+```
+
+An additional `r n_incidental` article`r if (n_incidental != 1) "s"` were
+classified as Incidental Mention, meaning delta smelt appeared in the abstract
+but was not the primary subject of study.
+
+### 2008 Biological Opinion
+
+In 2008, a Biological Opinion concluded that Central Valley Project and State
+Water Project operations jeopardized the endangered delta smelt, risking its
+extinction. This motivated a rapid increase in research on delta smelt, as 
+evidenced by the marked growth in the number of peer-reviewed publications after
+2008.
+
+\vspace{1em}
+
+```{r cumulative-area, echo = FALSE, fig.cap = "Cumulative delta smelt publications by research category.", fig.width = 10, fig.height = 6}
+.plot_data <- classified |>
+  dplyr::filter(pc_field != "Incidental Mention") |>
+  dplyr::count(year, pc_field) |>
+  tidyr::complete(
+    year    = seq(min(year), max(year)),
+    pc_field,
+    fill    = list(n = 0L)
+  ) |>
+  dplyr::arrange(pc_field, year) |>
+  dplyr::group_by(pc_field) |>
+  dplyr::mutate(cumulative = cumsum(n)) |>
+  dplyr::ungroup()
+
+.y_stack_max <- .plot_data |>
+  dplyr::group_by(year) |>
+  dplyr::summarise(total = sum(cumulative), .groups = "drop") |>
+  dplyr::pull(total) |>
+  max()
+
+.y_label <- .y_stack_max * 1.05 * (2 / 3)
+
+.p <- ggplot2::ggplot(.plot_data, ggplot2::aes(x = year, y = cumulative, fill = pc_field)) +
+  ggplot2::geom_area(alpha = 0.85, colour = "white", linewidth = 0.4) +
+  ggplot2::geom_vline(
+    xintercept = 2008,
+    linetype   = "dotted",
+    colour     = "black",
+    linewidth  = 0.8
+  ) +
+  ggplot2::annotate(
+    "text",
+    x        = 2008,
+    y        = .y_label,
+    label    = "2008 BiOp",
+    hjust    = -0.15,
+    vjust    = 0.5,
+    size     = 4.5,
+    fontface = "bold"
+  ) +
+  ggplot2::scale_x_continuous(breaks = \(x) pretty(x, n = 8)) +
+  ggplot2::scale_y_continuous(
+    expand       = ggplot2::expansion(mult = c(0, 0.05)),
+    minor_breaks = \(x, ...) pretty(x, n = 20)
+  ) +
+  ggplot2::labs(
+    title = "Delta smelt publications",
+    x     = "Year",
+    y     = "Cumulative publications",
+    fill  = NULL
+  ) +
+  ggplot2::theme_minimal(base_size = 16, base_family = "serif") +
+  ggplot2::theme(
+    plot.title         = ggplot2::element_text(face = "bold"),
+    axis.title         = ggplot2::element_text(size = 16, face = "bold"),
+    axis.text          = ggplot2::element_text(size = 14),
+    legend.text        = ggplot2::element_text(size = 13),
+    legend.position    = "right",
+    legend.key.size    = ggplot2::unit(1.1, "lines"),
+    panel.grid.minor.x = ggplot2::element_blank(),
+    panel.grid.minor.y = ggplot2::element_line(colour = "grey88", linewidth = 0.3)
+  )
+
+.p
+ggplot2::ggsave(
+  "delta_smelt_publications.png",
+  plot   = .p,
+  width  = 10,
+  height = 6,
+  dpi    = 300,
+  bg     = "white"
+)
+```
+
+```{r write-csv, eval = FALSE, echo = FALSE}
+classified |>
+  dplyr::filter_out(pc_field == "Incidental Mention") |>
+  readr::write_csv("delta_smelt_classified.csv")
+```

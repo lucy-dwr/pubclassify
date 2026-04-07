@@ -44,6 +44,7 @@ The core ten are **stable** — never remove or rename them.
 | `title`         | `character`        |                                               |
 | `abstract`      | `character`        | `NA` when unavailable                         |
 | `year`          | `integer`          |                                               |
+| `doc_type`      | `character`        | Document type; `NA` for OpenAlex and Crossref |
 | `authors`       | `list` of `chr[]`  | Display names in order                        |
 | `affiliations`  | `list` of `list[]` | One inner list per author                     |
 | `funders`       | `list` of `chr[]`  | Funder display names                          |
