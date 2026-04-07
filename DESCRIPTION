@@ -10,7 +10,7 @@ Description: Retrieve peer-reviewed publication metadata from bibliometric
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends:
     R (>= 4.1.0)
 Imports:
@@ -22,7 +22,13 @@ Imports:
     rlang,
     tibble
 Suggests:
+    ggplot2,
     httptest2,
+    knitr,
+    readr,
+    rmarkdown,
     testthat (>= 3.0.0),
+    tidyr,
     withr
+VignetteBuilder: knitr
 Config/testthat/edition: 3
