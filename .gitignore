@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# AGENTS files
+.claude/
+AGENTS.md
+CLAUDE.md
