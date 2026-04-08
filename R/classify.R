@@ -18,7 +18,8 @@
 #'   `"anthropic"`, `"openai"`, or `"openai-compatible"`. Use
 #'   `"openai-compatible"` for any OpenAI-compatible gateway (e.g. a
 #'   multi-model proxy) that implements the `/chat/completions` endpoint but
-#'   not the newer OpenAI Responses API. Default `"anthropic"`.
+#'   not the newer OpenAI Responses API. Falls back to the value set with
+#'   [pc_configure()], then `"anthropic"`.
 #' @param model Character. Model identifier. If `NULL`, uses the provider
 #'   default as determined by `ellmer`.
 #' @param api_key Character. API key for the LLM provider. Falls back to the
@@ -73,7 +74,7 @@
 pc_classify <- function(
     pubs,
     taxonomy,
-    provider              = "anthropic",
+    provider              = NULL,
     model                 = NULL,
     api_key               = NULL,
     base_url              = NULL,
@@ -101,7 +102,9 @@ pc_classify <- function(
     ))
   }
 
-  # Credential lookup: argument -> .pc_env -> environment variable -> NULL
+  # Credential lookup: argument -> .pc_env -> environment variable -> default
+  provider <- provider %||% .pc_env$llm_provider %||% "anthropic"
+
   api_key <- api_key %||% .pc_env$llm_key %||% {
     val <- Sys.getenv("PUBCLASSIFY_LLM_KEY", unset = NA_character_)
     if (is.na(val)) NULL else val
