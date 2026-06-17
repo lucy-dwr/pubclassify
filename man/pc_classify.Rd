@@ -7,7 +7,7 @@
 pc_classify(
   pubs,
   taxonomy,
-  provider = "anthropic",
+  provider = NULL,
   model = NULL,
   api_key = NULL,
   base_url = NULL,
@@ -32,7 +32,8 @@ into.}
 \code{"anthropic"}, \code{"openai"}, or \code{"openai-compatible"}. Use
 \code{"openai-compatible"} for any OpenAI-compatible gateway (e.g. a
 multi-model proxy) that implements the \verb{/chat/completions} endpoint but
-not the newer OpenAI Responses API. Default \code{"anthropic"}.}
+not the newer OpenAI Responses API. Falls back to the value set with
+\code{\link[=pc_configure]{pc_configure()}}, then \code{"anthropic"}.}
 
 \item{model}{Character. Model identifier. If \code{NULL}, uses the provider
 default as determined by \code{ellmer}.}

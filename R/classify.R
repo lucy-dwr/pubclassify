@@ -163,6 +163,10 @@ pc_classify <- function(
     batch <- pubs[batch_idx, ]
     texts <- .pc_build_classify_text(batch$title, batch$abstract)
 
+    chat_fn <- function() {
+      .pc_make_chat(provider, model, api_key, base_url, sys_msg, ...)
+    }
+
     if (use_embeddings) {
       # Narrow taxonomy per publication and classify individually
       for (i in seq_along(texts)) {
@@ -170,27 +174,19 @@ pc_classify <- function(
         candidates <- .pc_retrieve_candidates(pub_emb, taxonomy_embs,
                                               taxonomy, k = top_k)
         tax_prompt <- .pc_build_taxonomy_prompt(candidates)
-        chat       <- .pc_make_chat(provider, model, api_key, base_url,
-                                    sys_msg, ...)
-        classified <- .pc_classify_batch(texts[i], tax_prompt,
-                                         classify_instructions, chat,
-                                         candidates$field)
-        if (!is.null(classified)) {
-          row <- batch_idx[[i]]
-          pubs$pc_field[row]     <- classified$field[[1L]]
-          pubs$pc_rationale[row] <- classified$rationale[[1L]]
-        }
+        classified <- .pc_classify_with_retry(texts[i], tax_prompt,
+                                              classify_instructions, chat_fn,
+                                              candidates$field)
+        row <- batch_idx[[i]]
+        pubs$pc_field[row]     <- classified$field[[1L]]
+        pubs$pc_rationale[row] <- classified$rationale[[1L]]
       }
     } else {
-      chat       <- .pc_make_chat(provider, model, api_key, base_url,
-                                  sys_msg, ...)
-      classified <- .pc_classify_batch(texts, full_taxonomy_prompt,
-                                       classify_instructions, chat,
-                                       taxonomy$field)
-      if (!is.null(classified)) {
-        pubs$pc_field[batch_idx]     <- classified$field
-        pubs$pc_rationale[batch_idx] <- classified$rationale
-      }
+      classified <- .pc_classify_with_retry(texts, full_taxonomy_prompt,
+                                            classify_instructions, chat_fn,
+                                            taxonomy$field)
+      pubs$pc_field[batch_idx]     <- classified$field
+      pubs$pc_rationale[batch_idx] <- classified$rationale
     }
 
     cli::cli_progress_update(inc = length(batch_idx))
@@ -300,12 +296,26 @@ pc_classify <- function(
       rationales <- vapply(raw, function(x) as.character(x[["rationale"]]), character(1L))
     }
 
+    # Validate that the returned indices are exactly 1..n, each present once.
+    # A mismatch (missing, duplicated, or out-of-range indices) means we cannot
+    # reliably align results to the submitted publications, so we abort to the
+    # error handler below rather than risk silently mislabelling rows.
+    if (length(indices) != n || !setequal(indices, seq_len(n))) {
+      cli::cli_abort(c(
+        "Model returned {length(indices)} result{?s} for {n} \\
+         publication{?s}, with indices that do not match {.code 1:{n}}.",
+        "i" = "Returned indices: {.val {indices}}."
+      ))
+    }
+
     # Validate returned field names against the taxonomy
     invalid <- !fields %in% valid_fields
     if (any(invalid)) {
+      invalid_n <- sum(invalid)
+      row_word  <- if (invalid_n == 1L) "that row" else "those rows"
       cli::cli_warn(c(
-        "{sum(invalid)} publication{?s} received an unrecognised category.",
-        "i" = "Setting {.field pc_field} to {.val NA} for {?that/those} row{?s}."
+        "{invalid_n} publication{?s} received an unrecognised category.",
+        "i" = "Setting {.field pc_field} to {.val NA} for {row_word}."
       ))
       fields[invalid]     <- NA_character_
       rationales[invalid] <- NA_character_
@@ -331,6 +341,66 @@ pc_classify <- function(
       stringsAsFactors = FALSE
     )
   })
+}
+
+
+# Classify a batch, retrying any publications the model leaves unclassified.
+#
+# texts            - character vector, one entry per publication
+# taxonomy_prompt  - pre-built taxonomy section string
+# classify_instructions - optional extra guidance string (or NULL)
+# chat_fn          - zero-argument factory returning a fresh ellmer chat object.
+#                    A new chat is created per attempt so retries do not inherit
+#                    the prior conversation's state.
+# valid_fields     - character vector of valid taxonomy field names
+# max_retries      - maximum number of LLM attempts before giving up
+#
+# A publication is "unclassified" when .pc_classify_batch returns NA for it,
+# whether because the batch call failed or because the returned category was
+# not in valid_fields. Such rows are resubmitted (on their own) on the next
+# attempt. Rows still unclassified after max_retries attempts are left NA.
+#
+# Returns a data.frame(field, rationale) with one row per text, in input order.
+#' @noRd
+.pc_classify_with_retry <- function(texts, taxonomy_prompt,
+                                    classify_instructions, chat_fn,
+                                    valid_fields, max_retries = 3L) {
+  n          <- length(texts)
+  fields     <- rep(NA_character_, n)
+  rationales <- rep(NA_character_, n)
+  pending    <- seq_len(n)
+
+  attempt <- 0L
+  while (length(pending) > 0L && attempt < max_retries) {
+    attempt <- attempt + 1L
+
+    result <- .pc_classify_batch(
+      texts[pending], taxonomy_prompt, classify_instructions,
+      chat_fn(), valid_fields
+    )
+
+    got <- !is.na(result$field)
+    fields[pending[got]]     <- result$field[got]
+    rationales[pending[got]] <- result$rationale[got]
+    pending                  <- pending[!got]
+
+    if (length(pending) > 0L && attempt < max_retries) {
+      cli::cli_inform(c(
+        "i" = "Retrying {length(pending)} unclassified publication{?s} \\
+               (attempt {attempt + 1L} of {max_retries})."
+      ))
+    }
+  }
+
+  if (length(pending) > 0L) {
+    cli::cli_warn(c(
+      "{length(pending)} publication{?s} could not be classified after \\
+       {max_retries} attempt{?s}.",
+      "i" = "Leaving {.field pc_field} and {.field pc_rationale} as {.val NA}."
+    ))
+  }
+
+  data.frame(field = fields, rationale = rationales, stringsAsFactors = FALSE)
 }
 
 
