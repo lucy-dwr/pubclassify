@@ -26,10 +26,13 @@
 #'   value set with [pc_configure()], then the `PUBCLASSIFY_LLM_KEY`
 #'   environment variable, then the provider's own default variable
 #'   (e.g. `OPENAI_API_KEY`).
-#' @param base_url Character. Base URL for an OpenAI-compatible API endpoint.
-#'   Only used when `provider = "openai"`. Falls back to the value set with
+#' @param base_url Character. Base URL for the LLM provider's API endpoint,
+#'   for targeting a non-default deployment (e.g. a proxy, gateway, or
+#'   cloud-hosted endpoint such as Azure AI Foundry). Used for
+#'   `provider = "openai"`, `"openai-compatible"`, and `"anthropic"`; required
+#'   for `"openai-compatible"`. Falls back to the value set with
 #'   [pc_configure()], then the `PUBCLASSIFY_LLM_BASE_URL` environment
-#'   variable. If still `NULL`, the standard OpenAI endpoint is used.
+#'   variable. If still `NULL`, each provider's standard endpoint is used.
 #' @param system_prompt Character. Replaces the default system message sent to
 #'   the LLM. The default instructs the model to act as a scientific literature
 #'   classifier and return structured JSON. Override this to change the model's
@@ -199,31 +202,29 @@ pc_classify <- function(
 
 # Create an ellmer chat object for the specified provider.
 # Returns a chat object with the system prompt set.
+#
+# base_url is omitted entirely (rather than passed as NULL) when unset, since
+# the underlying ellmer chat_*() constructors validate an explicit
+# base_url = NULL as a type error instead of falling back to their own
+# provider default.
 #' @noRd
 .pc_make_chat <- function(provider, model, api_key, base_url, system_prompt,
                           ...) {
+  args <- list(
+    system_prompt = system_prompt,
+    credentials   = if (!is.null(api_key)) function() api_key else NULL,
+    model         = model,
+    ...
+  )
+  if (!is.null(base_url)) {
+    args$base_url <- base_url
+  }
+
   switch(
     provider,
-    openai = ellmer::chat_openai(
-      system_prompt = system_prompt,
-      base_url      = base_url,
-      credentials   = if (!is.null(api_key)) function() api_key else NULL,
-      model         = model,
-      ...
-    ),
-    `openai-compatible` = ellmer::chat_openai_compatible(
-      base_url      = base_url,
-      system_prompt = system_prompt,
-      credentials   = if (!is.null(api_key)) function() api_key else NULL,
-      model         = model,
-      ...
-    ),
-    anthropic = ellmer::chat_anthropic(
-      system_prompt = system_prompt,
-      credentials   = if (!is.null(api_key)) function() api_key else NULL,
-      model         = model,
-      ...
-    ),
+    openai              = do.call(ellmer::chat_openai, args),
+    `openai-compatible` = do.call(ellmer::chat_openai_compatible, args),
+    anthropic           = do.call(ellmer::chat_anthropic, args),
     cli::cli_abort(
       c(
         "Unsupported LLM provider: {.val {provider}}.",

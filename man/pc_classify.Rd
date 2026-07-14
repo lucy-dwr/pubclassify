@@ -43,10 +43,13 @@ value set with \code{\link[=pc_configure]{pc_configure()}}, then the \code{PUBCL
 environment variable, then the provider's own default variable
 (e.g. \code{OPENAI_API_KEY}).}
 
-\item{base_url}{Character. Base URL for an OpenAI-compatible API endpoint.
-Only used when \code{provider = "openai"}. Falls back to the value set with
+\item{base_url}{Character. Base URL for the LLM provider's API endpoint,
+for targeting a non-default deployment (e.g. a proxy, gateway, or
+cloud-hosted endpoint such as Azure AI Foundry). Used for
+\code{provider = "openai"}, \code{"openai-compatible"}, and \code{"anthropic"}; required
+for \code{"openai-compatible"}. Falls back to the value set with
 \code{\link[=pc_configure]{pc_configure()}}, then the \code{PUBCLASSIFY_LLM_BASE_URL} environment
-variable. If still \code{NULL}, the standard OpenAI endpoint is used.}
+variable. If still \code{NULL}, each provider's standard endpoint is used.}
 
 \item{system_prompt}{Character. Replaces the default system message sent to
 the LLM. The default instructs the model to act as a scientific literature

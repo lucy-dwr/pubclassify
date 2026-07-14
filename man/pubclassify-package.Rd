@@ -34,5 +34,10 @@ language models.
 \author{
 \strong{Maintainer}: Lucy Andrews \email{lucy.andrews@water.ca.gov}
 
+Authors:
+\itemize{
+  \item Lucy Andrews \email{lucy.andrews@water.ca.gov}
+}
+
 }
 \keyword{internal}
